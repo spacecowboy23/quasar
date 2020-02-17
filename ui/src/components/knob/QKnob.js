@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-import { position, stopAndPrevent } from '../../utils/event.js'
+import { position } from '../../utils/event.js'
 import { between, normalizeToInterval } from '../../utils/format.js'
 import { slot } from '../../utils/slot.js'
 import { cache } from '../../utils/vm.js'
@@ -8,9 +8,9 @@ import { cache } from '../../utils/vm.js'
 import QCircularProgress from '../circular-progress/QCircularProgress.js'
 import FormMixin from '../../mixins/form.js'
 import TouchPan from '../../directives/TouchPan.js'
+import { updateFromKeydown } from '../../shared/shared'
 
-// PGDOWN, LEFT, DOWN, PGUP, RIGHT, UP
-const keyCodes = [34, 37, 40, 33, 39, 38]
+import { keyCodes } from '../../components/slider/slider-utils'
 
 export default Vue.extend({
   name: 'QKnob',
@@ -131,21 +131,10 @@ export default Vue.extend({
     },
 
     __keydown (evt) {
-      if (!keyCodes.includes(evt.keyCode)) {
-        return
-      }
-
-      stopAndPrevent(evt)
-
-      const
-        step = ([34, 33].includes(evt.keyCode) ? 10 : 1) * this.computedStep,
-        offset = [34, 37, 40].includes(evt.keyCode) ? -step : step
-
-      this.model = between(
-        parseFloat((this.model + offset).toFixed(this.decimals)),
-        this.min,
-        this.max
-      )
+      const { computedStep, min, max, model } = this
+      const newModel = updateFromKeydown({ evt, computedStep, min, max, model })
+      if (!newModel) return
+      this.model = newModel
 
       this.__updateValue()
     },

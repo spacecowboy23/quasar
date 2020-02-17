@@ -3,13 +3,12 @@ import Vue from 'vue'
 import {
   getRatio,
   getModel,
-  SliderMixin,
-  keyCodes
+  SliderMixin
 } from './slider-utils.js'
 
 import { between } from '../../utils/format.js'
-import { stopAndPrevent } from '../../utils/event.js'
 import { cache } from '../../utils/vm.js'
+import { updateFromKeydown } from '../../shared/shared'
 
 export default Vue.extend({
   name: 'QSlider',
@@ -144,22 +143,10 @@ export default Vue.extend({
     },
 
     __keydown (evt) {
-      if (!keyCodes.includes(evt.keyCode)) {
-        return
-      }
-
-      stopAndPrevent(evt)
-
-      const
-        step = ([34, 33].includes(evt.keyCode) ? 10 : 1) * this.computedStep,
-        offset = [34, 37, 40].includes(evt.keyCode) ? -step : step
-
-      this.model = between(
-        parseFloat((this.model + offset).toFixed(this.decimals)),
-        this.min,
-        this.max
-      )
-
+      const { computedStep, min, max, model } = this
+      const newModel = updateFromKeydown({ evt, computedStep, min, max, model })
+      if (!newModel) return
+      this.model = newModel
       this.__updateValue()
     }
   },

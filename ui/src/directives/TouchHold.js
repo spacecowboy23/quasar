@@ -1,7 +1,8 @@
 import { client } from '../plugins/Platform.js'
-import { addEvt, cleanEvt, getTouchTarget } from '../utils/touch.js'
+import { addEvt, cleanEvt } from '../utils/touch.js'
 import { position, leftClick, stopAndPrevent, noop } from '../utils/event.js'
 import { clearSelection } from '../utils/selection.js'
+import { sharedTouchStart } from '../shared/shared'
 
 function update (el, binding) {
   const ctx = el.__qtouchhold
@@ -51,15 +52,7 @@ export default {
       },
 
       touchStart (evt) {
-        if (evt.target !== void 0 && typeof ctx.handler === 'function') {
-          const target = getTouchTarget(evt.target)
-          addEvt(ctx, 'temp', [
-            [ target, 'touchmove', 'move', 'passiveCapture' ],
-            [ target, 'touchcancel', 'end', 'notPassiveCapture' ],
-            [ target, 'touchend', 'end', 'notPassiveCapture' ]
-          ])
-          ctx.start(evt)
-        }
+        sharedTouchStart({ evt, ctx })
       },
 
       start (evt, mouseEvent) {

@@ -78,12 +78,7 @@ function jalCalLeap (jy) {
   }
   n = jy - jp
 
-  if (jump - n < 6) { n = n - jump + div(jump + 4, 33) * 33 }
-  leap = mod(mod(n + 1, 33) - 1, 4)
-  if (leap === -1) {
-    leap = 4
-  }
-
+  leap = calculateLeap({ jump, n })
   return leap
 }
 
@@ -140,11 +135,7 @@ function jalCal (jy, withoutLeap) {
 
   // Find how many years have passed since the last leap year.
   if (!withoutLeap) {
-    if (jump - n < 6) { n = n - jump + div(jump + 4, 33) * 33 }
-    leap = mod(mod(n + 1, 33) - 1, 4)
-    if (leap === -1) {
-      leap = 4
-    }
+    leap = calculateLeap({ jump, n })
   }
 
   return {
@@ -276,4 +267,20 @@ function div (a, b) {
 
 function mod (a, b) {
   return a - ~~(a / b) * b
+}
+
+/**
+ *
+ * @param jump
+ * @param n
+ * @returns {*}
+ */
+function calculateLeap ({ jump, n }) {
+  if (jump - n < 6) { n = n - jump + div(jump + 4, 33) * 33 }
+  let leap = mod(mod(n + 1, 33) - 1, 4)
+  if (leap === -1) {
+    leap = 4
+  }
+
+  return leap
 }
