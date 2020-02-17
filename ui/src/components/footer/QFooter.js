@@ -5,6 +5,7 @@ import { onSSR } from '../../plugins/Platform.js'
 import { mergeSlot } from '../../utils/slot.js'
 import { stop } from '../../utils/event.js'
 import { cache } from '../../utils/vm.js'
+import { headerFooterStyle } from '../../shared/shared'
 
 export default Vue.extend({
   name: 'QFooter',
@@ -114,18 +115,14 @@ export default Vue.extend({
     },
 
     style () {
-      const
-        view = this.layout.rows.bottom,
-        css = {}
+      const view = this.layout.rows.bottom
+      const {
+        $q: { lang: { rtl } },
+        layout
+      } = this
 
-      if (view[0] === 'l' && this.layout.left.space === true) {
-        css[this.$q.lang.rtl === true ? 'right' : 'left'] = `${this.layout.left.size}px`
-      }
-      if (view[2] === 'r' && this.layout.right.space === true) {
-        css[this.$q.lang.rtl === true ? 'left' : 'right'] = `${this.layout.right.size}px`
-      }
-
-      return css
+      // alculate and return css
+      return headerFooterStyle({ view, layout, rtl })
     }
   },
 
